@@ -1,7 +1,7 @@
 
 #########################################
 #  Dados trabalhados neste script:      #
-#  - 2. Dados Agricultura Familiar Sim  #
+#  - 3. Dados Agricultura Familiar Não  #
 #########################################
 
 # Pacotes -----------------------------------------------------------------
@@ -19,7 +19,7 @@ library(dplyr)
 # Dados -------------------------------------------------------------------
 
 # Caminho dos arquivos para leitura
-path <- list.files("data/IBGE/2. Dados Agricultura Familiar Sim/", full.names = T)
+path <- list.files("data/IBGE/3. Dados Agricultura Familiar Não/", full.names = T)
 
 # Conferir nome das Sheets
 map(path, ~ .x %>% excel_sheets()) # Os 7 arquivos possuem a mesma ordem: 'Quantidade' sempre em primeiro
