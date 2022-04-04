@@ -209,15 +209,10 @@ valor_da_producao_fam_sim <-
   select(cod_ibge, Municipio, Estado, Tipologia, Grupo, Produto, UMedida, Quantidade) %>% 
   `colnames<-`(c("Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida", "Quantidade"))
 
-# Base Final --------------------------------------------------------------
-
-data_fam_sim <- quantidade_produzida_fam_sim %>% bind_rows(valor_da_producao_fam_sim)
-
 # -------------------------------------------------------------------------
 
 rm(
-  cod_ibge, quantidade_produzida_fam_sim, valor_da_producao_fam_sim,
-  lista_valor_da_producao_agr, lista_valor_da_producao_agr_4,
+  cod_ibge, lista_valor_da_producao_agr, lista_valor_da_producao_agr_4,
   lista_valor_da_producao_agr_mod_1, lista_valor_da_producao_agr_mod_2,
   lista_valor_da_producao_agr_mod_2_aux, pos_valor_da_producao_pec,
   lista_valor_da_producao_pec, lista_valor_da_producao_pec_aux

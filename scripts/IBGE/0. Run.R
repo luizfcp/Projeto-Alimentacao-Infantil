@@ -6,20 +6,18 @@ library(tictoc)
 
 # Dados -------------------------------------------------------------------
 
-path_scripts <- list.files("scripts/IBGE/", full.names = T)
-
 # Leitura dos Scripts
-tic(); source(path_scripts[2], encoding = "UTF-8"); toc() # Familiar Não
-tic(); source(path_scripts[3], encoding = "UTF-8"); toc() # Familiar Sim
+tic(); source("scripts/IBGE/Dados Familiar - Agricultura e Pecuaria - Não.R", encoding = "UTF-8"); toc() # Familiar Não
+tic(); source("scripts/IBGE/Dados Familiar - Agricultura e Pecuaria - Sim.R", encoding = "UTF-8"); toc() # Familiar Sim
 
-# Data - IBGE: Familiar Não e Sim
+# Data - Quantidade e Valor: Familiar Não e Sim
 
-data_ibge <- data_fam_nao %>% bind_rows(data_fam_sim)
+quantidade_produzida <- quantidade_produzida_fam_nao %>% bind_rows(quantidade_produzida_fam_sim)
+valor_da_producao <- valor_da_producao_fam_nao %>% bind_rows(valor_da_producao_fam_sim)
 
 # -------------------------------------------------------------------------
 
 rm(
-  path_scripts, data_fam_nao, data_fam_sim
+  quantidade_produzida_fam_nao, quantidade_produzida_fam_sim,
+  valor_da_producao_fam_nao, valor_da_producao_fam_sim
 )
-
-# -------------------------------------------------------------------------
