@@ -21,3 +21,5 @@ rm(
   quantidade_produzida_fam_nao, quantidade_produzida_fam_sim,
   valor_da_producao_fam_nao, valor_da_producao_fam_sim
 )
+
+# -------------------------------------------------------------------------
