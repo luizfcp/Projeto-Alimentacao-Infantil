@@ -31,11 +31,27 @@ tic(); source("scripts/2. Manipulação Produtos.R", encoding = "UTF-8"); toc() 
 
 tic(); source("scripts/3. Merge ComexStat.R", encoding = "UTF-8"); toc() # Adicionando as colunas Quantidade (Toneladas) e Valor FOB (US$)
 
+# Juntando as Bases de dados ----------------------------------------------
+
+quantidade_produzida <- quantidade_produzida_agr %>% bind_rows(quantidade_produzida_pec)
+valor_da_producao <- valor_da_producao_agr %>% bind_rows(valor_da_producao_pec)
+
+# Dados - Share -----------------------------------------------------------
+
+tic(); source("scripts/4. Participação de Exportação.R", encoding = "UTF-8"); toc() # Participação de Exportação
+
 # OUTPUT - Salvando as bases de dados -------------------------------------
 
+# Quantidade Produzida e Valor da Produção
 quantidade_produzida %>% write_xlsx("output/quantidade_produzida.xlsx")
 valor_da_producao %>% write_xlsx("output/valor_da_producao.xlsx")
+
+# Quantidade Produzida Familiar Sim - Matriz
+quantidade_produzida_agr_sim_matriz %>% write_xlsx("output/matriz_agricultura.xlsx")
+quantidade_produzida_pec_sim_matriz %>% write_xlsx("output/matriz_pecuaria.xlsx")
 
 # -------------------------------------------------------------------------
 
 gc()
+
+# -------------------------------------------------------------------------

@@ -11,7 +11,10 @@ library(dplyr)
 
 # Dados -------------------------------------------------------------------
 
-def_produtos <- read_excel("data/IBGE/Produtos.xlsx") %>% mutate(join = "T")
+def_produtos_agr <- read_excel("data/IBGE/Produtos.xlsx", sheet = 1) %>% 
+  select(Produto) %>% 
+  mutate(join = "T") %>% 
+  filter(!str_detect(Produto, "^Outros"))
 
 # Mudança nos valores X/../.../-  -----------------------------------------
 
@@ -45,10 +48,14 @@ quantidade_produzida_pec <- quantidade_produzida %>% filter(str_detect(Tipologia
 valor_da_producao_agr <- valor_da_producao %>% filter(str_detect(Tipologia, "Agricultura"))
 valor_da_producao_pec <- valor_da_producao %>% filter(str_detect(Tipologia, "Pecuária"))
 
-# Manipulação - Agrupamento dos produtos ----------------------------------
+# -------------------------------------------------------------------------
+
+rm(quantidade_produzida, valor_da_producao)
+
+# Manipulação Agricultura - Agrupamento dos produtos ----------------------
 
 ## Quantidade Produzida
-quantidade_produzida_agr_join <- quantidade_produzida_agr %>% left_join(def_produtos, by = "Produto")
+quantidade_produzida_agr_join <- quantidade_produzida_agr %>% left_join(def_produtos_agr, by = "Produto")
 
 quantidade_produzida_agr_T <- quantidade_produzida_agr_join %>% 
   filter(join=="T") %>% 
@@ -72,24 +79,23 @@ quantidade_produzida_agr_T <- quantidade_produzida_agr_join %>%
 quantidade_produzida_agr_outros <- 
   quantidade_produzida_agr_join %>% 
   filter(is.na(join)) %>%
-  mutate(
-    Agregado = case_when(
-      str_detect(Grupo, "lavoura temporária") ~ "Sorgo",
-      str_detect(Grupo, "lavoura permanente") ~ "Sorgo",
-      TRUE ~ Grupo
-    )
-  ) %>% 
-  mutate(Grupo = Agregado) %>% 
   group_by(Grupo, `Unidade de Medida`, `Código IBGE`, `Nome do Município`, `Estado (UF)`, Tipologia) %>% 
   summarise(Quantidade = sum(Quantidade, na.rm = TRUE)) %>% 
   ungroup() %>% 
-  mutate(Produto = ifelse(Grupo=="Sorgo", "Sorgo", paste("Outros -", Grupo))) %>% 
+  mutate(
+    Produto = case_when(
+      Grupo=="Produtos da silvicultura"                  ~ "Produtos da Silvicultura",
+      str_detect(Grupo, "aquicultura x Condição do")     ~ "Pesca e aquicultura (peixe, crustáceos e moluscos)",
+      Grupo=="Condição do produtor em relação às terras" ~ "Leite de vaca",
+      TRUE ~ paste("Outros", Grupo)
+    )
+  ) %>% 
   select(`Código IBGE`, `Nome do Município`, `Estado (UF)`, Tipologia, Grupo, Produto, `Unidade de Medida`, Quantidade)
 
 quantidade_produzida_agr <- quantidade_produzida_agr_T %>% bind_rows(quantidade_produzida_agr_outros)
 
 ## Valor da Produção
-valor_da_producao_agr_join <- valor_da_producao_agr %>% left_join(def_produtos, by = "Produto")
+valor_da_producao_agr_join <- valor_da_producao_agr %>% left_join(def_produtos_agr, by = "Produto")
 
 valor_da_producao_agr_T <- valor_da_producao_agr_join %>% 
   filter(join=="T") %>% 
@@ -113,34 +119,68 @@ valor_da_producao_agr_T <- valor_da_producao_agr_join %>%
 valor_da_producao_agr_outros <- 
   valor_da_producao_agr_join %>% 
   filter(is.na(join)) %>%
-  mutate(
-    Agregado = case_when(
-      str_detect(Grupo, "lavoura temporária") ~ "Sorgo",
-      str_detect(Grupo, "lavoura permanente") ~ "Sorgo",
-      TRUE ~ Grupo
-    )
-  ) %>% 
-  mutate(Grupo = Agregado) %>% 
   group_by(Grupo, `Unidade de Medida`, `Código IBGE`, `Nome do Município`, `Estado (UF)`, Tipologia) %>% 
   summarise("Valor da Produção" = sum(`Valor da Produção`, na.rm = TRUE)) %>% 
   ungroup() %>% 
-  mutate(Produto = ifelse(Grupo=="Sorgo", "Sorgo", paste("Outros -", Grupo))) %>% 
+  mutate(
+    Produto = case_when(
+      Grupo=="Produtos da silvicultura"                  ~ "Produtos da Silvicultura",
+      str_detect(Grupo, "aquicultura x Condição do")     ~ "Pesca e aquicultura (peixe, crustáceos e moluscos)",
+      Grupo=="Condição do produtor em relação às terras" ~ "Leite de vaca",
+      TRUE ~ paste("Outros", Grupo)
+    )
+  ) %>% 
   select(`Código IBGE`, `Nome do Município`, `Estado (UF)`, Tipologia, Grupo, Produto, `Unidade de Medida`, `Valor da Produção`)
 
 valor_da_producao_agr <- valor_da_producao_agr_T %>% bind_rows(valor_da_producao_agr_outros)
 
-# Montando as tabelas finais ----------------------------------------------
-
-quantidade_produzida <- quantidade_produzida_agr %>% bind_rows(quantidade_produzida_pec)
-valor_da_producao <- valor_da_producao_agr %>% bind_rows(valor_da_producao_pec)
-
 # -------------------------------------------------------------------------
 
 rm(
-  quantidade_produzida_agr, quantidade_produzida_agr_join, quantidade_produzida_agr_outros, quantidade_produzida_agr_T,
-  valor_da_producao_agr, valor_da_producao_agr_join, valor_da_producao_agr_outros, valor_da_producao_agr_T,
-  quantidade_produzida_pec, valor_da_producao_pec, def_produtos
+  quantidade_produzida_agr_join, quantidade_produzida_agr_T, quantidade_produzida_agr_outros,
+  valor_da_producao_agr_join, valor_da_producao_agr_T, valor_da_producao_agr_outros,
+  def_produtos_agr
 )
+
+# Manipulação Pecuária - Agrupamento dos produtos -------------------------
+
+## Quantidade Produzida
+quantidade_produzida_pec %<>% 
+  mutate(
+    Agregado = case_when(
+      str_detect(Produto, "50 cabeças e menos") ~ "Carne bovina",
+      str_detect(Produto, "mais de 50 cabeças") ~ "Carne bovina",
+      str_detect(Produto, "cabeças de galinhas, galos") ~ "Carne de Aves e Frangos",
+      str_detect(Produto, "cabeças de suínos") ~ "Carne Suína",
+      str_detect(Produto, "ovos de galinhas") ~ "Ovos de galinhas",
+      TRUE ~ Produto
+    )
+  ) %>% 
+  mutate(Produto = Agregado) %>% 
+  group_by(Produto, Grupo, `Unidade de Medida`, `Código IBGE`, `Nome do Município`, `Estado (UF)`, Tipologia) %>% 
+  summarise(Quantidade = sum(Quantidade, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  select(`Código IBGE`, `Nome do Município`, `Estado (UF)`, Tipologia, Grupo, Produto, `Unidade de Medida`, Quantidade)
+
+## Valor da Produção
+valor_da_producao_pec %<>% 
+  mutate(
+    Agregado = case_when(
+      str_detect(Produto, "50 cabeças e menos") ~ "Carne bovina",
+      str_detect(Produto, "mais de 50 cabeças") ~ "Carne bovina",
+      str_detect(Produto, "cabeças de galinhas, galos") ~ "Carne de Aves e Frangos",
+      str_detect(Produto, "cabeças de suínos") ~ "Carne Suina",
+      str_detect(Produto, "ovos de galinhas") ~ "Ovos de galinhas",
+      TRUE ~ Produto
+    )
+  ) %>% 
+  mutate(Produto = Agregado) %>% 
+  group_by(Produto, Grupo, `Unidade de Medida`, `Código IBGE`, `Nome do Município`, `Estado (UF)`, Tipologia) %>% 
+  summarise("Valor da Produção" = sum(`Valor da Produção`, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  select(`Código IBGE`, `Nome do Município`, `Estado (UF)`, Tipologia, Grupo, Produto, `Unidade de Medida`, `Valor da Produção`)
+
+# -------------------------------------------------------------------------
 
 gc()
 
