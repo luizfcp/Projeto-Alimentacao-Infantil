@@ -60,7 +60,7 @@ comexstat_pec <- read_excel("data/ComexStat/ComexStat.xlsx", sheet = "Importar_P
 quantidade_produzida_agr <- quantidade_produzida_agr %>% 
   mutate(join = paste(`Nome do Município`, "-", `Estado (UF)`, "_", Produto)) %>% 
   left_join(comexstat_agr, by = c("join")) %>% 
-  select(-join, -`Valor FOB (US$)`)
+  select(-join, `Valor FOB (US$)`)
 
 valor_da_producao_agr <- valor_da_producao_agr %>% 
   mutate(join = paste(`Nome do Município`, "-", `Estado (UF)`, "_", Produto)) %>% 
@@ -71,7 +71,7 @@ valor_da_producao_agr <- valor_da_producao_agr %>%
 quantidade_produzida_pec <- quantidade_produzida_pec %>% 
   mutate(join = paste(`Nome do Município`, "-", `Estado (UF)`, "_", Produto)) %>% 
   left_join(comexstat_pec, by = c("join")) %>% 
-  select(-join, -`Valor FOB (US$)`)
+  select(-join, `Valor FOB (US$)`)
 
 valor_da_producao_pec <- valor_da_producao_pec %>% 
   mutate(join = paste(`Nome do Município`, "-", `Estado (UF)`, "_", Produto)) %>% 
