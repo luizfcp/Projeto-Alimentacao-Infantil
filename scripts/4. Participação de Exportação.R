@@ -119,7 +119,7 @@ valor_fob_agr_sim_matriz <- quantidade_produzida_perc_agr_sim %>%
   mutate(`Região` = ifelse(UF=="Brasil", "Brasil", `Região`)) %>% 
   arrange(`Região`)
 
-# Vetor da Matriz Valor FOB
+# Vetor da Matriz Valor FOB ~ Quantidade Produzida da Agricultura Familiar Sim
 valor_fob_agr_sim_vetor <- quantidade_produzida_perc_agr_sim %>% 
   mutate(valor_fob_sim = perc_quantidade*Valor_FOB) %>% 
   select(`Estado (UF)`, Produto, valor_fob_sim) %>% 
@@ -130,7 +130,34 @@ valor_fob_agr_sim_vetor <- quantidade_produzida_perc_agr_sim %>%
   left_join(cod_ibge, by = c("UF")) %>% 
   select(`Região`, UF, everything()) %>% 
   mutate(`Região` = ifelse(UF=="Brasil", "Brasil", `Região`)) %>% 
+  arrange(`Região`) %>% 
+  `colnames<-`(c("Região", "UF", "Agricultura Familiar"))
+  
+# Matriz ComexStat Valor FOB ~ Quantidade Produzida da Pecuária Familiar Sim
+valor_fob_pec_sim_matriz <- quantidade_produzida_perc_pec_sim %>% 
+  mutate(valor_fob_sim = perc_quantidade*Valor_FOB) %>% 
+  select(`Estado (UF)`, Produto, valor_fob_sim) %>% 
+  `colnames<-`(c("UF", "Produto", "Valor")) %>% 
+  pivot_wider(names_from = Produto, values_from = Valor) %>% 
+  mutate_all(~ ifelse(is.na(.x), "-", .x)) %>% 
+  left_join(cod_ibge, by = c("UF")) %>% 
+  select(`Região`, UF, everything()) %>% 
+  mutate(`Região` = ifelse(UF=="Brasil", "Brasil", `Região`)) %>% 
   arrange(`Região`)
+
+# Vetor da Matriz Valor FOB ~ Quantidade Produzida da Pecuária Familiar Sim
+valor_fob_pec_sim_vetor <- quantidade_produzida_perc_pec_sim %>% 
+  mutate(valor_fob_sim = perc_quantidade*Valor_FOB) %>% 
+  select(`Estado (UF)`, Produto, valor_fob_sim) %>% 
+  `colnames<-`(c("UF", "Produto", "Valor")) %>% 
+  group_by(UF) %>% 
+  summarise(Valor_soma = sum(Valor, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  left_join(cod_ibge, by = c("UF")) %>% 
+  select(`Região`, UF, everything()) %>% 
+  mutate(`Região` = ifelse(UF=="Brasil", "Brasil", `Região`)) %>% 
+  arrange(`Região`) %>% 
+  `colnames<-`(c("Região", "UF", "Pecuária Familiar"))
   
 # -------------------------------------------------------------------------
 
