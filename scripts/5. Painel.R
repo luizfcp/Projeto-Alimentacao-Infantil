@@ -21,20 +21,16 @@ cod_ibge <- read_excel("data/IBGE/Geon_Cod.xlsx") %>%
 # Integração Censos
 int_censo <- read_excel("data/IBGE/IntegraçãoCensosAgropecuarios 2006 e 2017.xlsx")
 
+################################## 2017 ################################### 
+
 # Bases de dados 2017
 suppressMessages({
   # Leitura dos Scripts
-  tic(); source("scripts/1. Dados Familiar - Agricultura e Pecuaria - Não.R", encoding = "UTF-8"); toc() # Familiar Não
-  tic(); source("scripts/1. Dados Familiar - Agricultura e Pecuaria - Sim.R", encoding = "UTF-8"); toc() # Familiar Sim
+  source("scripts/1. Dados Familiar - Agricultura e Pecuaria - Não.R", encoding = "UTF-8") # Familiar Não
+  source("scripts/1. Dados Familiar - Agricultura e Pecuaria - Sim.R", encoding = "UTF-8") # Familiar Sim
 })
 
-
-
-
-
 # Manipulação -------------------------------------------------------------
-
-############################### Agricultura ###############################
 
 agr <- quantidade_produzida %>% 
   left_join(
@@ -59,3 +55,38 @@ rm()
 gc()
 
 # -------------------------------------------------------------------------
+
+################################## 2006 ################################### 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
