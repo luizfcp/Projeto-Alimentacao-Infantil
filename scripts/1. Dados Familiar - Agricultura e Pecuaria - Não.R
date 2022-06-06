@@ -21,8 +21,8 @@ library(dplyr)
 cod_ibge <- read_excel("data/IBGE/Geon_Cod.xlsx") %>% select(1, mun_uf) %>% `colnames<-`(c("cod_ibge", "mun_uf"))
 
 # Caminho dos arquivos para leitura
-path_agricultura_fam_nao <- list.files("data/IBGE/1. Agricultura/3. Dados Agricultura Familiar Nao/", full.names = T)
-path_pecuaria_fam_nao <- list.files("data/IBGE/2. Pecuária/3. Dados Pecuária Familiar Nao/", full.names = T)
+path_agricultura_fam_nao <- list.files("data/IBGE/Dados 2017/1. Agricultura/3. Dados Agricultura Familiar Nao/", full.names = T)
+path_pecuaria_fam_nao <- list.files("data/IBGE/Dados 2017/2. Pecuária/3. Dados Pecuária Familiar Nao/", full.names = T)
 
 # Conferir nome das Sheets
 map(path_agricultura_fam_nao, ~ .x %>% excel_sheets()) # Os 7 arquivos possuem a mesma ordem: 'Quantidade' sempre em primeiro
