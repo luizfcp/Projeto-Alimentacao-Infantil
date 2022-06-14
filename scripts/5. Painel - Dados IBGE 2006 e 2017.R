@@ -932,18 +932,18 @@ gc()
 ############################## Painel Final ###############################
 # ----------------------------------------------------------------------- #
 
-painel <- painel_2006 %>% 
-  bind_rows(painel_2017) %>% 
-  arrange(Tipologia, regiao, `Código IBGE`, Produto, censo) %>% 
-  `colnames<-`(
-    c("Tipologia", "Região", "Estado", "Municípios", "Código IBGE do Município", "Censo", "Produto", "Setor do produto", "Grupo do Produto", 
-      "Valor da produção", "Unidade de Medida do valor da produção", "Quantidade produzida", "Unidade de Medida da Quantidade produzida")
-  )
-
-# -------------------------------------------------------------------------
-
-rm(painel_2006, painel_2017)
-
-gc()
-
-# -------------------------------------------------------------------------
+# painel <- painel_2006 %>% 
+#   bind_rows(painel_2017) %>% 
+#   arrange(Tipologia, regiao, `Código IBGE`, Produto, censo) %>% 
+#   `colnames<-`(
+#     c("Tipologia", "Região", "Estado", "Municípios", "Código IBGE do Município", "Censo", "Produto", "Setor do produto", "Grupo do Produto", 
+#       "Valor da produção", "Unidade de Medida do valor da produção", "Quantidade produzida", "Unidade de Medida da Quantidade produzida")
+#   )
+# 
+# # -------------------------------------------------------------------------
+# 
+# rm(painel_2006, painel_2017)
+# 
+# gc()
+# 
+# # -------------------------------------------------------------------------
