@@ -21,6 +21,15 @@ cod_ibge <- read_excel("data/IBGE/Geon_Cod.xlsx") %>% select(1, mun_uf, regiao) 
 # Integração Censos
 int_censo <- read_excel("data/IBGE/IntegraçãoCensosAgropecuarios 2006 e 2017.xlsx") %>% clean_names() %>% select(2, 5, 3, 4)
 
+# 2006 e 2017 - Censo População
+data_populacao <- read_excel("data/IBGE/Populacao.xls") %>%
+  clean_names() %>%
+  mutate(
+    municipios = municipios %>% str_to_lower(),
+    ufmun = paste(uf, "__", municipios),
+    codmun = paste0(cod_uf, cod_munic) %>% as.numeric(),
+  ) %>%
+  select(ufmun, codmun, populacao_2006, populacao_2017)
 
 ################################## 2017 ################################### 
 
@@ -458,8 +467,10 @@ painel_2017 <- fam_sim_2017 %>%
     censo = 2017,
   ) %>% 
   left_join(int_censo, by = c("num_tabela" = "numero_das_tabelas_extraidas_do_censo_agropecuaria_de_2017")) %>% 
+  left_join(data_populacao, by = c("Código IBGE"="codmun")) %>% 
   select(Tipologia, regiao, `Estado (UF)`, `Nome do Município`, `Código IBGE`, censo, Produto, setores, grupos_do_produto, 
-         `Valor da Produção`, `Unidade de Medida Val`, Quantidade, `Unidade de Medida Qt`)
+         `Valor da Produção`, `Unidade de Medida Val`, Quantidade, `Unidade de Medida Qt`, populacao_2017) %>% 
+  rename("População 2017"=populacao_2017)
 
 # -------------------------------------------------------------------------
 
@@ -916,8 +927,10 @@ painel_2006 <- fam_sim_2006 %>%
     censo = 2006,
   ) %>% 
   left_join(int_censo, by = c("num_tabela" = "numero_das_tabelas_extraidas_do_censo_agropecuaria_de_2006")) %>% 
+  left_join(data_populacao, by = c("Código IBGE"="codmun")) %>% 
   select(Tipologia, regiao, `Estado (UF)`, `Nome do Município`, `Código IBGE`, censo, Produto, setores, grupos_do_produto, 
-         `Valor da Produção`, `Unidade de Medida Val`, Quantidade, `Unidade de Medida Qt`)
+         `Valor da Produção`, `Unidade de Medida Val`, Quantidade, `Unidade de Medida Qt`, populacao_2006) %>% 
+  rename("População 2006"=populacao_2006)
 
 # -------------------------------------------------------------------------
 
