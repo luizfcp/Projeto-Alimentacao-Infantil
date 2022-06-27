@@ -193,3 +193,5 @@ rm(censo_educ_2006, censo_educ_2017)
 gc()
 
 # -------------------------------------------------------------------------
+
+painel_educacional %>% writexl::write_xlsx(path = "output/painel_educacional.xlsx")
