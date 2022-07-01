@@ -122,10 +122,11 @@ gc()
 # ----------------------------------------------------------------------- #
 
 censo_educ_2017 <- censo_educ_2017 %>% 
-  mutate_at(6:27, ~ ifelse(is.na(.x), 0, .x) %>% as.numeric()) %>% 
+  select(-c(QT_PROF_NUTRICIONISTA, QT_PROF_ALIMENTACAO )) %>% 
+  mutate_at(6:25, ~ ifelse(is.na(.x), 0, .x) %>% as.numeric()) %>% 
   `colnames<-`(c(
-    "Regiao", "Estado_Sigla", "Municipio", "Censo", "Dependencia_Administrativa", "Energia_Eletrica_Publica", "Cozinha", "Refeitorio", "Nutricionista", 
-    "Profissionais_Cozinha", "FNDE", "Educacao_Basica", "Educacao_Infantil", "Educacao_Infantil_Creche", "Educacao_Infantil_PreEscola", "Educacao_Fundamental",
+    "Regiao", "Estado_Sigla", "Municipio", "Censo", "Dependencia_Administrativa", "Energia_Eletrica_Publica", "Cozinha", "Refeitorio",  
+    "FNDE", "Educacao_Basica", "Educacao_Infantil", "Educacao_Infantil_Creche", "Educacao_Infantil_PreEscola", "Educacao_Fundamental",
     "Educacao_Fundamental_AI", "Educacao_Fundamental_AF", "Educacao_Medio", "Educacao_Profissional", "Educacao_Profissional_Tecnico", "Educacao_EJA", 
     "Educacao_EJA_Fundamental", "Educacao_EJA_Medio", "Educacao_Especial", "Educacao_Especial_Inclusiva", "Educacao_Especial_Exclusiva"
   )) %>% 
@@ -136,8 +137,6 @@ censo_educ_2017 <- censo_educ_2017 %>%
     Energia_Eletrica_Publica = sum(Energia_Eletrica_Publica, na.rm = T)/n(),
     Cozinha = sum(Cozinha, na.rm = T)/n(),
     Refeitorio = sum(Refeitorio, na.rm = T)/n(),
-    Nutricionista = sum(Nutricionista, na.rm = T)/n(),
-    Profissionais_Cozinha = sum(Profissionais_Cozinha, na.rm = T)/n(),
     FNDE = sum(FNDE, na.rm = T)/n(),
     # Demais variaveis: Não são Binarias
     Educacao_Basica = sum(Educacao_Basica, na.rm = T), 
