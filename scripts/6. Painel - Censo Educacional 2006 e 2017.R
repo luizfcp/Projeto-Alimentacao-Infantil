@@ -81,29 +81,14 @@ censo_educ_2006 <- censo_educ_2006 %>%
     Educacao_Fundamental, Educacao_Fundamental_AI, Educacao_Fundamental_AF, Educacao_Medio, Educacao_EJA, Educacao_EJA_Fundamental, Educacao_EJA_Medio
   )
 
-# --------------------------------------------------------------------------------------------------------------------------------- #
-# Exemplo por extenso do Agrupamento 1: Binaria Energia Eletrica Publica
-# censo_educ_2006 %>% 
-#   group_by(SIGLA, MUNIC, Censo, DEP) %>%
-#   summarise(
-#     total_EEP = length(Energia_Eletrica_Publica), # total de escolas no municipio
-#     soma_EEP = sum(Energia_Eletrica_Publica, na.rm = T) # total de escolas com Energia no municipio
-#   ) %>% 
-#   ungroup() %>% 
-#   mutate(
-#     EEP = total_EEP/2, # variavel auxiliar: media do total de escolas no municipio
-#     Energia_Eletrica_Publica = ifelse(soma_EEP>=EEP, 1, 0) # se soma_EEP for maior ou igual a EEP (media), retorna 1, cc 0
-#   )
-# --------------------------------------------------------------------------------------------------------------------------------- #
-
 # Calculo das variaveis por municipio
 censo_educ_2006 <- censo_educ_2006 %>% 
   group_by(SIGLA, MUNIC, Censo, DEP) %>% 
   summarise(
     # Binarias: Energia Eletrica Publica, Cozinha, Refeitorio
-    Energia_Eletrica_Publica = ifelse(sum(Energia_Eletrica_Publica, na.rm = T)>={length(Energia_Eletrica_Publica)/2}, 1, 0),
-    Cozinha = ifelse(sum(Cozinha, na.rm = T)>={length(Cozinha)/2}, 1, 0),
-    Refeitorio = ifelse(sum(Refeitorio, na.rm = T)>={length(Refeitorio)/2}, 1, 0),
+    Energia_Eletrica_Publica = sum(Energia_Eletrica_Publica, na.rm = T)/n(),
+    Cozinha = sum(Cozinha, na.rm = T)/n(),
+    Refeitorio = sum(Refeitorio, na.rm = T)/n(),
     # Demais variaveis: Não são Binarias
     Educacao_Basica = sum(Educacao_Basica, na.rm = T), 
     Educacao_Infantil = sum(Educacao_Infantil, na.rm = T), 
@@ -147,13 +132,13 @@ censo_educ_2017 <- censo_educ_2017 %>%
   select(Regiao, Estado_Sigla, Municipio, Censo, everything()) %>% 
   group_by(Regiao, Estado_Sigla, Municipio, Censo, Dependencia_Administrativa) %>% 
   summarise(
-    # Binarias: Energia Eletrica Publica, Cozinha, Refeitorio
-    Energia_Eletrica_Publica = ifelse(sum(Energia_Eletrica_Publica, na.rm = T)>={length(Energia_Eletrica_Publica)/2}, 1, 0),
-    Cozinha = ifelse(sum(Cozinha, na.rm = T)>={length(Cozinha)/2}, 1, 0),
-    Refeitorio = ifelse(sum(Refeitorio, na.rm = T)>={length(Refeitorio)/2}, 1, 0),
-    Nutricionista = ifelse(sum(Nutricionista, na.rm = T)>={length(Nutricionista)/2}, 1, 0),
-    Profissionais_Cozinha = ifelse(sum(Profissionais_Cozinha, na.rm = T)>={length(Profissionais_Cozinha)/2}, 1, 0),
-    FNDE = ifelse(sum(FNDE, na.rm = T)>={length(FNDE)/2}, 1, 0),
+    # Binarias: Energia Eletrica Publica, Cozinha, Refeitorio, Nutricionista, Profissionais_Cozinha, FNDE
+    Energia_Eletrica_Publica = sum(Energia_Eletrica_Publica, na.rm = T)/n(),
+    Cozinha = sum(Cozinha, na.rm = T)/n(),
+    Refeitorio = sum(Refeitorio, na.rm = T)/n(),
+    Nutricionista = sum(Nutricionista, na.rm = T)/n(),
+    Profissionais_Cozinha = sum(Profissionais_Cozinha, na.rm = T)/n(),
+    FNDE = sum(FNDE, na.rm = T)/n(),
     # Demais variaveis: Não são Binarias
     Educacao_Basica = sum(Educacao_Basica, na.rm = T), 
     Educacao_Infantil = sum(Educacao_Infantil, na.rm = T), 
