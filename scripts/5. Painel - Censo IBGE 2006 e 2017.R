@@ -591,8 +591,11 @@ painel_2017 <- painel_2017_aux_num %>%
   ) %>% 
   mutate(Quantidade = as.character(Quantidade)) %>% 
   bind_rows(painel_2017_aux_chr) %>% 
-  mutate(`Unidade de Medida Qt` = "Toneladas")
-
+  mutate(`Unidade de Medida Qt` = "Toneladas") %>% 
+  `colnames<-`(
+    c("Tipologia", "Região", "Estado", "Municípios", "Código IBGE do Município", "Censo", "Produto", "Setor do produto", "Grupo do Produto",
+      "Valor da produção", "Unidade de Medida do valor da produção", "Quantidade produzida", "Unidade de Medida da Quantidade produzida", "População")
+  )
 
 # -------------------------------------------------------------------------
 
@@ -1111,7 +1114,11 @@ painel_2006 <- painel_2006_aux_num %>%
   ) %>% 
   mutate(Quantidade = as.character(Quantidade)) %>% 
   bind_rows(painel_2006_aux_chr) %>% 
-  mutate(`Unidade de Medida Qt` = "Toneladas")
+  mutate(`Unidade de Medida Qt` = "Toneladas") %>% 
+  `colnames<-`(
+    c("Tipologia", "Região", "Estado", "Municípios", "Código IBGE do Município", "Censo", "Produto", "Setor do produto", "Grupo do Produto",
+      "Valor da produção", "Unidade de Medida do valor da produção", "Quantidade produzida", "Unidade de Medida da Quantidade produzida", "População")
+  )
 
 # -------------------------------------------------------------------------
 
@@ -1126,14 +1133,10 @@ gc()
 # ----------------------------------------------------------------------- #
 ############################## Painel Final ###############################
 # ----------------------------------------------------------------------- #
-
-# painel <- painel_2006 %>% 
-#   bind_rows(painel_2017) %>% 
-#   arrange(Tipologia, regiao, `Código IBGE`, Produto, censo) %>% 
-#   `colnames<-`(
-#     c("Tipologia", "Região", "Estado", "Municípios", "Código IBGE do Município", "Censo", "Produto", "Setor do produto", "Grupo do Produto", 
-#       "Valor da produção", "Unidade de Medida do valor da produção", "Quantidade produzida", "Unidade de Medida da Quantidade produzida")
-#   )
+# 
+# painel <- painel_2006 %>%
+#   bind_rows(painel_2017) %>%
+#   arrange(Tipologia, `Região`, `Código IBGE do Município`, Produto, Censo)
 # 
 # # -------------------------------------------------------------------------
 # 
@@ -1142,3 +1145,6 @@ gc()
 # gc()
 # 
 # # -------------------------------------------------------------------------
+
+saveRDS(painel_2006, "output/painel_ibge_2006.rds")
+saveRDS(painel_2017, "output/painel_ibge_2017.rds")
