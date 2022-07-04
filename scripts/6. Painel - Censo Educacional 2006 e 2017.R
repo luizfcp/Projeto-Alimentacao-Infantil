@@ -181,4 +181,4 @@ gc()
 
 # -------------------------------------------------------------------------
 
-# painel_educacional %>% writexl::write_xlsx(path = "output/painel_educacional.xlsx")
+saveRDS(painel_educacional, "output/painel_educacional.rds")
