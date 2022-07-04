@@ -13,6 +13,10 @@ library(magrittr)
 library(stringr)
 library(dplyr)
 
+`%notin%` <- Negate(`%in%`)
+
+options(scipen = 999999999)
+
 # Dados -------------------------------------------------------------------
 
 # Codigo IBGE
@@ -148,7 +152,29 @@ data_populacao <- read_excel("data/IBGE/Populacao.xls") %>%
       UMedida = UMedida %>% str_remove_all("[[:punct:]]")
     ) %>% 
     select(num_tabela, regiao, cod_ibge, Municipio, Estado, Tipologia, Grupo, Produto, UMedida, Quantidade) %>% 
-    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Qt", "Quantidade"))
+    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Qt", "Quantidade")) %>% 
+    mutate(
+      Produto = Produto %>% str_remove_all("[[:punct:]]Mil Reais[[:punct:]]") %>% str_trim(),
+      Produto = case_when(
+        Produto=="Número de cabeças de bovinos vendidas nos estabelecimentos agropecuários com 50 cabeças e menos"             ~ "Cabeças de bovinos nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Valor da venda de cabeças de bovinos nos estabelecimentos agropecuários com 50 cabeças e menos"              ~ "Cabeças de bovinos nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Número de cabeças de bovinos vendidas nos estabelecimentos agropecuários com mais de 50 cabeças"             ~ "Cabeças de bovinos nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Valor da venda de cabeças de bovinos nos estabelecimentos agropecuários com mais de 50 cabeças"              ~ "Cabeças de bovinos nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Número de cabeças de bovinos para abate vendidas nos estabelecimentos agropecuários com 50 cabeças e menos"  ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Valor da venda de cabeças de bovinos para abate nos estabelecimentos agropecuários com 50 cabeças e menos"   ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Número de cabeças de bovinos para abate vendidas nos estabelecimentos agropecuários com mais de 50 cabeças"  ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Valor da venda de cabeças de bovinos para abate nos estabelecimentos agropecuários com mais de 50 cabeças"   ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Número de cabeças de galinhas, galos, frangas, frangos e pintos vendidas nos estabelecimentos agropecuários" ~ "Cabeças de galinhas, galos, frangas, frangos e pintos nos estabelecimentos agropecuários",
+        Produto=="Valor da venda de cabeças de galinhas, galos, frangas, frangos e pintos nos estabelecimentos agropecuários"  ~ "Cabeças de galinhas, galos, frangas, frangos e pintos nos estabelecimentos agropecuários",
+        Produto=="Número de cabeças de suínos vendidas nos estabelecimentos agropecuários"                                     ~ "Cabeças de suínos nos estabelecimentos agropecuários",
+        Produto=="Valor da venda de cabeças de suínos nos estabelecimentos agropecuários"                                      ~ "Cabeças de suínos nos estabelecimentos agropecuários",
+        Produto=="Quantidade produzida de leite de vaca"                                                                       ~ "Leite de vaca",
+        Produto=="Valor da produção de leite de vaca"                                                                          ~ "Leite de vaca",
+        Produto=="Quantidade vendida de ovos de galinhas"                                                                      ~ "Ovos de galinhas",
+        Produto=="Valor da venda dos ovos de galinhas"                                                                         ~ "Ovos de galinhas",
+        TRUE ~ Produto
+      )
+    )
   
   # -------------------------------------------------------------------------
   
@@ -225,7 +251,29 @@ data_populacao <- read_excel("data/IBGE/Populacao.xls") %>%
       UMedida = UMedida %>% sub(".*\\(", "", .) %>% str_remove_all("[[:punct:]]")
     ) %>% 
     select(num_tabela, regiao, cod_ibge, Municipio, Estado, Tipologia, Grupo, Produto, UMedida, Quantidade) %>% 
-    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Val", "Valor da Produção"))
+    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Val", "Valor da Produção")) %>% 
+    mutate(
+      Produto = Produto %>% str_remove_all("[[:punct:]]Mil Reais[[:punct:]]") %>% str_trim(),
+      Produto = case_when(
+        Produto=="Número de cabeças de bovinos vendidas nos estabelecimentos agropecuários com 50 cabeças e menos"             ~ "Cabeças de bovinos nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Valor da venda de cabeças de bovinos nos estabelecimentos agropecuários com 50 cabeças e menos"              ~ "Cabeças de bovinos nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Número de cabeças de bovinos vendidas nos estabelecimentos agropecuários com mais de 50 cabeças"             ~ "Cabeças de bovinos nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Valor da venda de cabeças de bovinos nos estabelecimentos agropecuários com mais de 50 cabeças"              ~ "Cabeças de bovinos nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Número de cabeças de bovinos para abate vendidas nos estabelecimentos agropecuários com 50 cabeças e menos"  ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Valor da venda de cabeças de bovinos para abate nos estabelecimentos agropecuários com 50 cabeças e menos"   ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Número de cabeças de bovinos para abate vendidas nos estabelecimentos agropecuários com mais de 50 cabeças"  ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Valor da venda de cabeças de bovinos para abate nos estabelecimentos agropecuários com mais de 50 cabeças"   ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Número de cabeças de galinhas, galos, frangas, frangos e pintos vendidas nos estabelecimentos agropecuários" ~ "Cabeças de galinhas, galos, frangas, frangos e pintos nos estabelecimentos agropecuários",
+        Produto=="Valor da venda de cabeças de galinhas, galos, frangas, frangos e pintos nos estabelecimentos agropecuários"  ~ "Cabeças de galinhas, galos, frangas, frangos e pintos nos estabelecimentos agropecuários",
+        Produto=="Número de cabeças de suínos vendidas nos estabelecimentos agropecuários"                                     ~ "Cabeças de suínos nos estabelecimentos agropecuários",
+        Produto=="Valor da venda de cabeças de suínos nos estabelecimentos agropecuários"                                      ~ "Cabeças de suínos nos estabelecimentos agropecuários",
+        Produto=="Quantidade produzida de leite de vaca"                                                                       ~ "Leite de vaca",
+        Produto=="Valor da produção de leite de vaca"                                                                          ~ "Leite de vaca",
+        Produto=="Quantidade vendida de ovos de galinhas"                                                                      ~ "Ovos de galinhas",
+        Produto=="Valor da venda dos ovos de galinhas"                                                                         ~ "Ovos de galinhas",
+        TRUE ~ Produto
+      )
+    )
   
   # -------------------------------------------------------------------------
   
@@ -355,7 +403,29 @@ data_populacao <- read_excel("data/IBGE/Populacao.xls") %>%
       UMedida = UMedida %>% str_remove_all("[[:punct:]]")
     ) %>% 
     select(num_tabela, regiao, cod_ibge, Municipio, Estado, Tipologia, Grupo, Produto, UMedida, Quantidade) %>% 
-    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Qt", "Quantidade"))
+    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Qt", "Quantidade")) %>% 
+    mutate(
+      Produto = Produto %>% str_remove_all("[[:punct:]]Mil Reais[[:punct:]]") %>% str_trim(),
+      Produto = case_when(
+        Produto=="Número de cabeças de bovinos vendidas nos estabelecimentos agropecuários com 50 cabeças e menos"             ~ "Cabeças de bovinos nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Valor da venda de cabeças de bovinos nos estabelecimentos agropecuários com 50 cabeças e menos"              ~ "Cabeças de bovinos nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Número de cabeças de bovinos vendidas nos estabelecimentos agropecuários com mais de 50 cabeças"             ~ "Cabeças de bovinos nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Valor da venda de cabeças de bovinos nos estabelecimentos agropecuários com mais de 50 cabeças"              ~ "Cabeças de bovinos nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Número de cabeças de bovinos para abate vendidas nos estabelecimentos agropecuários com 50 cabeças e menos"  ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Valor da venda de cabeças de bovinos para abate nos estabelecimentos agropecuários com 50 cabeças e menos"   ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Número de cabeças de bovinos para abate vendidas nos estabelecimentos agropecuários com mais de 50 cabeças"  ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Valor da venda de cabeças de bovinos para abate nos estabelecimentos agropecuários com mais de 50 cabeças"   ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Número de cabeças de galinhas, galos, frangas, frangos e pintos vendidas nos estabelecimentos agropecuários" ~ "Cabeças de galinhas, galos, frangas, frangos e pintos nos estabelecimentos agropecuários",
+        Produto=="Valor da venda de cabeças de galinhas, galos, frangas, frangos e pintos nos estabelecimentos agropecuários"  ~ "Cabeças de galinhas, galos, frangas, frangos e pintos nos estabelecimentos agropecuários",
+        Produto=="Número de cabeças de suínos vendidas nos estabelecimentos agropecuários"                                     ~ "Cabeças de suínos nos estabelecimentos agropecuários",
+        Produto=="Valor da venda de cabeças de suínos nos estabelecimentos agropecuários"                                      ~ "Cabeças de suínos nos estabelecimentos agropecuários",
+        Produto=="Quantidade produzida de leite de vaca"                                                                       ~ "Leite de vaca",
+        Produto=="Valor da produção de leite de vaca"                                                                          ~ "Leite de vaca",
+        Produto=="Quantidade vendida de ovos de galinhas"                                                                      ~ "Ovos de galinhas",
+        Produto=="Valor da venda dos ovos de galinhas"                                                                         ~ "Ovos de galinhas",
+        TRUE ~ Produto
+      )
+    )
   
   # -------------------------------------------------------------------------
   
@@ -430,7 +500,29 @@ data_populacao <- read_excel("data/IBGE/Populacao.xls") %>%
       UMedida = UMedida %>% sub(".*\\(", "", .) %>% str_remove_all("[[:punct:]]")
     ) %>% 
     select(num_tabela, regiao, cod_ibge, Municipio, Estado, Tipologia, Grupo, Produto, UMedida, Quantidade) %>% 
-    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Val", "Valor da Produção"))
+    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Val", "Valor da Produção")) %>% 
+    mutate(
+      Produto = Produto %>% str_remove_all("[[:punct:]]Mil Reais[[:punct:]]") %>% str_trim(),
+      Produto = case_when(
+        Produto=="Número de cabeças de bovinos vendidas nos estabelecimentos agropecuários com 50 cabeças e menos"             ~ "Cabeças de bovinos nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Valor da venda de cabeças de bovinos nos estabelecimentos agropecuários com 50 cabeças e menos"              ~ "Cabeças de bovinos nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Número de cabeças de bovinos vendidas nos estabelecimentos agropecuários com mais de 50 cabeças"             ~ "Cabeças de bovinos nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Valor da venda de cabeças de bovinos nos estabelecimentos agropecuários com mais de 50 cabeças"              ~ "Cabeças de bovinos nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Número de cabeças de bovinos para abate vendidas nos estabelecimentos agropecuários com 50 cabeças e menos"  ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Valor da venda de cabeças de bovinos para abate nos estabelecimentos agropecuários com 50 cabeças e menos"   ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com 50 cabeças e menos",
+        Produto=="Número de cabeças de bovinos para abate vendidas nos estabelecimentos agropecuários com mais de 50 cabeças"  ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Valor da venda de cabeças de bovinos para abate nos estabelecimentos agropecuários com mais de 50 cabeças"   ~ "Cabeças de bovinos para abate nos estabelecimentos agropecuários com mais de 50 cabeças",
+        Produto=="Número de cabeças de galinhas, galos, frangas, frangos e pintos vendidas nos estabelecimentos agropecuários" ~ "Cabeças de galinhas, galos, frangas, frangos e pintos nos estabelecimentos agropecuários",
+        Produto=="Valor da venda de cabeças de galinhas, galos, frangas, frangos e pintos nos estabelecimentos agropecuários"  ~ "Cabeças de galinhas, galos, frangas, frangos e pintos nos estabelecimentos agropecuários",
+        Produto=="Número de cabeças de suínos vendidas nos estabelecimentos agropecuários"                                     ~ "Cabeças de suínos nos estabelecimentos agropecuários",
+        Produto=="Valor da venda de cabeças de suínos nos estabelecimentos agropecuários"                                      ~ "Cabeças de suínos nos estabelecimentos agropecuários",
+        Produto=="Quantidade produzida de leite de vaca"                                                                       ~ "Leite de vaca",
+        Produto=="Valor da produção de leite de vaca"                                                                          ~ "Leite de vaca",
+        Produto=="Quantidade vendida de ovos de galinhas"                                                                      ~ "Ovos de galinhas",
+        Produto=="Valor da venda dos ovos de galinhas"                                                                         ~ "Ovos de galinhas",
+        TRUE ~ Produto
+      )
+    )
   
   # -------------------------------------------------------------------------
   
@@ -472,11 +564,41 @@ painel_2017 <- fam_sim_2017 %>%
          `Valor da Produção`, `Unidade de Medida Val`, Quantidade, `Unidade de Medida Qt`, populacao_2017) %>% 
   rename("População 2017"=populacao_2017)
 
+# Removendo unidades de medida
+painel_2017 <- painel_2017 %>% filter(`Unidade de Medida Qt` %notin% c("não se aplica", "Mil unidades", "Cabeças", "Mil cabeças")) 
+
+# Separando os dados de quantidade para trabalhar com os numericos
+painel_2017_aux_chr <- painel_2017 %>% filter(Quantidade %in% c("-", "X"))
+painel_2017_aux_num <- painel_2017 %>% filter(Quantidade %notin% c("-", "X")) %>% mutate(Quantidade = as.numeric(Quantidade))
+
+painel_2017 <- painel_2017_aux_num %>% 
+  mutate(
+    Quantidade = case_when(
+      # Mil duzias
+      `Unidade de Medida Qt`=="Mil dúzias" & Produto=="Ostras/vieiras"                         ~ Quantidade*0.0006,
+      `Unidade de Medida Qt`=="Mil dúzias" & Produto=="Quantidade vendida de ovos de galinhas" ~ Quantidade*0.001,
+      # Quilograma
+      `Unidade de Medida Qt`=="Quilograma" ~ Quantidade*0.001,
+      # Mil metros cubicos
+      `Unidade de Medida Qt`=="Mil metros cúbicos" ~ Quantidade*0.001,
+      # Mil frutos
+      `Unidade de Medida Qt`=="Mil frutos" & Produto=="Abacaxi"      ~ Quantidade*0.00145,
+      `Unidade de Medida Qt`=="Mil frutos" & Produto=="Coco-da-baía" ~ Quantidade*0.0023,
+      `Unidade de Medida Qt`=="Mil frutos" & Produto=="Graviola"     ~ Quantidade*0.002,
+      `Unidade de Medida Qt`=="Mil frutos" & Produto=="Jaca"         ~ Quantidade*0.012,
+      TRUE ~ Quantidade
+    )
+  ) %>% 
+  mutate(Quantidade = as.character(Quantidade)) %>% 
+  bind_rows(painel_2017_aux_chr) %>% 
+  mutate(`Unidade de Medida Qt` = "Toneladas")
+
+
 # -------------------------------------------------------------------------
 
 rm(
   fam_nao_2017, fam_sim_2017, quantidade_produzida_fam_nao_2017, quantidade_produzida_fam_sim_2017,
-  valor_da_producao_fam_nao_2017, valor_da_producao_fam_sim_2017
+  valor_da_producao_fam_nao_2017, valor_da_producao_fam_sim_2017, painel_2017_aux_chr, painel_2017_aux_num
 )
 
 gc()
@@ -603,7 +725,15 @@ gc()
       UMedida = UMedida %>% str_remove_all("[[:punct:]]")
     ) %>% 
     select(num_tabela, regiao, cod_ibge, Municipio, Estado, Tipologia, Grupo, Produto, UMedida, Quantidade) %>% 
-    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Qt", "Quantidade"))
+    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Qt", "Quantidade")) %>% 
+    mutate(
+      Produto = Produto %>% str_remove_all("[[:punct:]]Mil Reais[[:punct:]]|[[:punct:]]Reais[[:punct:]]") %>% str_trim(),
+      Produto = case_when(
+        Produto=="Quantidade produzida de leite de vaca" ~ "Leite de vaca",
+        Produto=="Valor da produção de leite de vaca"    ~ "Leite de vaca",
+        TRUE ~ Produto
+      )
+    )
   
   # -------------------------------------------------------------------------
   
@@ -683,7 +813,15 @@ gc()
       UMedida = UMedida %>% sub(".*\\(", "", .) %>% str_remove_all("[[:punct:]]")
     ) %>% 
     select(num_tabela, regiao, cod_ibge, Municipio, Estado, Tipologia, Grupo, Produto, UMedida, Quantidade) %>% 
-    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Val", "Valor da Produção"))
+    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Val", "Valor da Produção")) %>% 
+    mutate(
+      Produto = Produto %>% str_remove_all("[[:punct:]]Mil Reais[[:punct:]]|[[:punct:]]Reais[[:punct:]]") %>% str_trim(),
+      Produto = case_when(
+        Produto=="Quantidade produzida de leite de vaca" ~ "Leite de vaca",
+        Produto=="Valor da produção de leite de vaca"    ~ "Leite de vaca",
+        TRUE ~ Produto
+      )
+    )
   
   # -------------------------------------------------------------------------
   
@@ -803,6 +941,7 @@ gc()
       Grupo = Grupo %>% str_remove_all("Ano x ")
     ) %>% 
     mutate(
+      Produto = Produto %>% str_replace_all("[[:punct:]]Quilogramas", "__Quilogramas"),
       Produto = Produto %>% str_replace_all("[[:punct:]]Tonelada", "__Tonelada"),
       Produto = Produto %>% str_replace_all("[[:punct:]]Mil", "__Mil"),
       Produto = Produto %>% str_replace_all("[[:punct:]]Cabeças", "__Cabeças"),
@@ -814,7 +953,15 @@ gc()
       UMedida = UMedida %>% str_remove_all("[[:punct:]]")
     ) %>% 
     select(num_tabela, regiao, cod_ibge, Municipio, Estado, Tipologia, Grupo, Produto, UMedida, Quantidade) %>% 
-    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Qt", "Quantidade"))
+    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Qt", "Quantidade")) %>% 
+    mutate(
+      Produto = Produto %>% str_remove_all("[[:punct:]]Mil Reais[[:punct:]]|[[:punct:]]Reais[[:punct:]]") %>% str_trim(),
+      Produto = case_when(
+        Produto=="Quantidade produzida de leite de vaca" ~ "Leite de vaca",
+        Produto=="Valor da produção de leite de vaca"    ~ "Leite de vaca",
+        TRUE ~ Produto
+      )
+    )
   
   # -------------------------------------------------------------------------
   
@@ -890,7 +1037,15 @@ gc()
       UMedida = UMedida %>% sub(".*\\(", "", .) %>% str_remove_all("[[:punct:]]")
     ) %>% 
     select(num_tabela, regiao, cod_ibge, Municipio, Estado, Tipologia, Grupo, Produto, UMedida, Quantidade) %>% 
-    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Val", "Valor da Produção"))
+    `colnames<-`(c("num_tabela", "regiao", "Código IBGE", "Nome do Município", "Estado (UF)", "Tipologia", "Grupo", "Produto", "Unidade de Medida Val", "Valor da Produção")) %>% 
+    mutate(
+      Produto = Produto %>% str_remove_all("[[:punct:]]Mil Reais[[:punct:]]|[[:punct:]]Reais[[:punct:]]") %>% str_trim(),
+      Produto = case_when(
+        Produto=="Quantidade produzida de leite de vaca" ~ "Leite de vaca",
+        Produto=="Valor da produção de leite de vaca"    ~ "Leite de vaca",
+        TRUE ~ Produto
+      )
+    )
   
   # -------------------------------------------------------------------------
   
@@ -932,11 +1087,38 @@ painel_2006 <- fam_sim_2006 %>%
          `Valor da Produção`, `Unidade de Medida Val`, Quantidade, `Unidade de Medida Qt`, populacao_2006) %>% 
   rename("População 2006"=populacao_2006)
 
+# Removendo unidades de medida
+painel_2006 <- painel_2006 %>% filter(`Unidade de Medida Qt` %notin% c("não se aplica", "Mil unidades", "Cabeças", "Mil cabeças")) 
+
+# Separando os dados de quantidade para trabalhar com os numericos
+painel_2006_aux_chr <- painel_2006 %>% filter(Quantidade %in% c("-", "X"))
+painel_2006_aux_num <- painel_2006 %>% filter(Quantidade %notin% c("-", "X")) %>% mutate(Quantidade = as.numeric(Quantidade))
+
+painel_2006 <- painel_2006_aux_num %>% 
+  mutate(
+    Quantidade = case_when(
+      # Quilograma
+      `Unidade de Medida Qt`=="Quilograma" ~ Quantidade*0.001,
+      # Mil metros cubicos
+      `Unidade de Medida Qt`=="Mil metros cúbicos" ~ Quantidade*0.001,
+      # Mil frutos
+      `Unidade de Medida Qt`=="Mil frutos" & Produto=="Abacaxi"      ~ Quantidade*0.00145,
+      `Unidade de Medida Qt`=="Mil frutos" & Produto=="Coco-da-baía" ~ Quantidade*0.0023,
+      `Unidade de Medida Qt`=="Mil frutos" & Produto=="Graviola"     ~ Quantidade*0.002,
+      `Unidade de Medida Qt`=="Mil frutos" & Produto=="Jaca"         ~ Quantidade*0.012,
+      TRUE ~ Quantidade
+    )
+  ) %>% 
+  mutate(Quantidade = as.character(Quantidade)) %>% 
+  bind_rows(painel_2006_aux_chr) %>% 
+  mutate(`Unidade de Medida Qt` = "Toneladas")
+
 # -------------------------------------------------------------------------
 
 rm(
   fam_nao_2006, fam_sim_2006, quantidade_produzida_fam_nao_2006, quantidade_produzida_fam_sim_2006,
-  valor_da_producao_fam_nao_2006, valor_da_producao_fam_sim_2006, cod_ibge, int_censo
+  valor_da_producao_fam_nao_2006, valor_da_producao_fam_sim_2006, cod_ibge, int_censo, data_populacao,
+  painel_2006_aux_chr, painel_2006_aux_num
 )
 
 gc()
