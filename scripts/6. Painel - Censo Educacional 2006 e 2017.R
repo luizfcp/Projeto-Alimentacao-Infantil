@@ -13,12 +13,14 @@ library(purrr)
 library(magrittr)
 library(stringr)
 library(dplyr)
+library(abjutils)
 
 # Dados -------------------------------------------------------------------
 
 # Codigo IBGE
 cod_ibge_ufre <- read_excel("data/IBGE/Geon_Cod.xlsx") %>% select(uf, regiao) %>% `colnames<-`(c("Estado_Sigla", "Regiao")) %>% distinct_all()
-cod_ibge_mun <- read_excel("data/IBGE/Geon_Cod.xlsx") %>% select(mun, 1) %>% `colnames<-`(c("NO_MUNICIPIO", "CO_MUNICIPIO")) %>% distinct_all()
+cod_ibge_mun <- read_excel("data/IBGE/Geon_Cod.xlsx") %>% select(mun, 1) %>% `colnames<-`(c("NO_MUNICIPIO", "CO_MUNICIPIO")) %>% distinct_all() %>% 
+  mutate(NO_MUNICIPIO = NO_MUNICIPIO %>% rm_accent() %>% str_to_lower())
 
 # 2006 - Filtro para o Censo Educacional
 filtro_2006 <- read_excel("data/Dados Educacionais/Censo 2006/Filtro_2006.xlsx") %>% 
@@ -41,8 +43,7 @@ censo_educ_2017 <- read.csv("data/Dados Educacionais/Censo 2017/Censo.Ed.Basica_
   as_tibble() %>% 
   select(-NO_MUNICIPIO) %>% 
   left_join(cod_ibge_mun, by = "CO_MUNICIPIO") %>% 
-  select(c(NO_REGIAO, SG_UF, NO_MUNICIPIO, NU_ANO_CENSO, filtro_2017$variaveis)) %>% 
-  mutate(NO_MUNICIPIO = str_to_title(NO_MUNICIPIO)) %>% 
+  select(c(NO_REGIAO, SG_UF, NO_MUNICIPIO, CO_MUNICIPIO, NU_ANO_CENSO, filtro_2017$variaveis)) %>% 
   filter(TP_DEPENDENCIA==3)
 
 # -------------------------------------------------------------------------
@@ -103,13 +104,15 @@ censo_educ_2006 <- censo_educ_2006 %>%
     Educacao_EJA_Medio = sum(Educacao_EJA_Medio, na.rm = T)
   ) %>% 
   ungroup() %>% 
-  rename(c(Estado_Sigla=SIGLA, Municipio=MUNIC, Dependencia_Administrativa=DEP)) %>% 
-  mutate(Municipio = str_to_title(Municipio))
+  rename(c(Estado_Sigla=SIGLA, Municipio=MUNIC, Dependencia_Administrativa=DEP))
 
 # Join para nome da Regiao
 censo_educ_2006 <- censo_educ_2006 %>% 
   left_join(cod_ibge_ufre, by = "Estado_Sigla") %>% 
-  select(Regiao, Estado_Sigla, Municipio, Censo, everything())
+  mutate(Municipio = Municipio %>% rm_accent() %>% str_to_lower()) %>% 
+  left_join(cod_ibge_mun, by = c("Municipio"="NO_MUNICIPIO")) %>% 
+  rename(c(Codigo_Municipio=CO_MUNICIPIO)) %>% 
+  select(Regiao, Estado_Sigla, Municipio, Codigo_Municipio, Censo, everything())
 
 # -------------------------------------------------------------------------
 
@@ -123,15 +126,15 @@ gc()
 
 censo_educ_2017 <- censo_educ_2017 %>% 
   select(-c(QT_PROF_NUTRICIONISTA, QT_PROF_ALIMENTACAO )) %>% 
-  mutate_at(6:25, ~ ifelse(is.na(.x), 0, .x) %>% as.numeric()) %>% 
+  mutate_at(7:26, ~ ifelse(is.na(.x), 0, .x) %>% as.numeric()) %>% 
   `colnames<-`(c(
-    "Regiao", "Estado_Sigla", "Municipio", "Censo", "Dependencia_Administrativa", "Energia_Eletrica_Publica", "Cozinha", "Refeitorio",  
+    "Regiao", "Estado_Sigla", "Municipio", "Codigo_Municipio", "Censo", "Dependencia_Administrativa", "Energia_Eletrica_Publica", "Cozinha", "Refeitorio",  
     "FNDE", "Educacao_Basica", "Educacao_Infantil", "Educacao_Infantil_Creche", "Educacao_Infantil_PreEscola", "Educacao_Fundamental",
     "Educacao_Fundamental_AI", "Educacao_Fundamental_AF", "Educacao_Medio", "Educacao_Profissional", "Educacao_Profissional_Tecnico", "Educacao_EJA", 
     "Educacao_EJA_Fundamental", "Educacao_EJA_Medio", "Educacao_Especial", "Educacao_Especial_Inclusiva", "Educacao_Especial_Exclusiva"
   )) %>% 
-  select(Regiao, Estado_Sigla, Municipio, Censo, everything()) %>% 
-  group_by(Regiao, Estado_Sigla, Municipio, Censo, Dependencia_Administrativa) %>% 
+  select(Regiao, Estado_Sigla, Municipio, Codigo_Municipio, Censo, everything()) %>% 
+  group_by(Regiao, Estado_Sigla, Municipio, Codigo_Municipio, Censo, Dependencia_Administrativa) %>% 
   summarise(
     # Binarias: Energia Eletrica Publica, Cozinha, Refeitorio, Nutricionista, Profissionais_Cozinha, FNDE
     Energia_Eletrica_Publica = sum(Energia_Eletrica_Publica, na.rm = T)/n(),
