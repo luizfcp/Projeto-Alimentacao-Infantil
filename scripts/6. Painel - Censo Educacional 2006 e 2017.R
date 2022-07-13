@@ -21,6 +21,7 @@ library(abjutils)
 cod_ibge_ufre <- read_excel("data/IBGE/Geon_Cod.xlsx") %>% select(uf, regiao) %>% `colnames<-`(c("Estado_Sigla", "Regiao")) %>% distinct_all()
 cod_ibge_mun <- read_excel("data/IBGE/Geon_Cod.xlsx") %>% select(mun, 1) %>% `colnames<-`(c("NO_MUNICIPIO", "CO_MUNICIPIO")) %>% distinct_all() %>% 
   mutate(NO_MUNICIPIO = NO_MUNICIPIO %>% rm_accent() %>% str_to_lower())
+cod_ibge_micro <- read_excel("data/IBGE/Geon_Cod.xlsx") %>% select(1, micro, cod_micro) %>% `colnames<-`(c("Codigo_Municipio", "Microrregiao", "Codigo_Microrregiao"))
 
 # 2006 - Filtro para o Censo Educacional
 filtro_2006 <- read_excel("data/Dados Educacionais/Censo 2006/Filtro_2006.xlsx") %>% 
@@ -111,8 +112,9 @@ censo_educ_2006 <- censo_educ_2006 %>%
   left_join(cod_ibge_ufre, by = "Estado_Sigla") %>% 
   mutate(Municipio = Municipio %>% rm_accent() %>% str_to_lower()) %>% 
   left_join(cod_ibge_mun, by = c("Municipio"="NO_MUNICIPIO")) %>% 
+  left_join(cod_ibge_micro, by = c("CO_MUNICIPIO"="Codigo_Municipio")) %>% 
   rename(c(Codigo_Municipio=CO_MUNICIPIO)) %>% 
-  select(Regiao, Estado_Sigla, Municipio, Codigo_Municipio, Censo, everything())
+  select(Regiao, Estado_Sigla, Municipio, Codigo_Municipio, Microrregiao, Codigo_Microrregiao, Censo, everything())
 
 # -------------------------------------------------------------------------
 
@@ -160,7 +162,9 @@ censo_educ_2017 <- censo_educ_2017 %>%
     Educacao_Especial_Exclusiva = sum(Educacao_Especial_Exclusiva, na.rm = T)
   ) %>% 
   ungroup() %>% 
-  mutate(Dependencia_Administrativa = "Municipal")
+  mutate(Dependencia_Administrativa = "Municipal") %>% 
+  left_join(cod_ibge_micro, by = c("Codigo_Municipio")) %>% 
+  select(Regiao, Estado_Sigla, Municipio, Codigo_Municipio, Microrregiao, Codigo_Microrregiao, Censo, everything())
 
 # -------------------------------------------------------------------------
 
