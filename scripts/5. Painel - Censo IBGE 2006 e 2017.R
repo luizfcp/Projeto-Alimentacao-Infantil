@@ -35,6 +35,12 @@ data_populacao <- read_excel("data/IBGE/Populacao.xls") %>%
   ) %>%
   select(ufmun, codmun, populacao_2006, populacao_2017)
 
+# Setores Agregados
+setores_agregados_amarelo <- read_excel("data/IBGE/Setores_Agregados.xlsx", sheet = 2)
+setores_agregados_amarelo_agr <- setores_agregados_amarelo %>% filter(`Setores Agregados`=="Agricultura") %$% Produtos
+setores_agregados_amarelo_pec <- setores_agregados_amarelo %>% filter(`Setores Agregados`=="Pecuária") %$% Produtos
+setores_agregados_amarelo_spa <- setores_agregados_amarelo %>% filter(`Setores Agregados`=="Sivilcultura e Pesca/Aquicultura") %$% Produtos
+
 ################################## 2017 ################################### 
 
 # ----------------------------------------------------------------------- #
@@ -591,9 +597,28 @@ painel_2017 <- painel_2017_aux_num %>%
   ) %>% 
   mutate(Quantidade = as.character(Quantidade)) %>% 
   bind_rows(painel_2017_aux_chr) %>% 
-  mutate(`Unidade de Medida Qt` = "Toneladas") %>% 
+  mutate(
+    `Unidade de Medida Qt` = "Toneladas",
+    setores_agregados = case_when(
+      # Agricultura
+      grupos_do_produto=="Produtos da horticultura"                  ~ "Agricultura",
+      grupos_do_produto=="Produtos da lavoura temporária"            ~ "Agricultura",
+      grupos_do_produto=="Produtos da lavoura permanente"            ~ "Agricultura",
+      grupos_do_produto=="Condição do produtor em relação às terras" ~ "Agricultura",
+      grupos_do_produto=="Produtos da agroindústria rural" & Produto %in% setores_agregados_amarelo_agr ~ "Agricultura",
+      # Sivilcultura e Pesca/Aquicultura
+      grupos_do_produto=="Produtos da silvicultura" ~ "Sivilcultura e Pesca/Aquicultura",
+      grupos_do_produto=="Espécie criada na aquicultura x Condição do produtor em relação às terras" ~ "Sivilcultura e Pesca/Aquicultura",
+      grupos_do_produto=="Produtos da agroindústria rural" & Produto %in% setores_agregados_amarelo_spa ~ "Sivilcultura e Pesca/Aquicultura",
+      # Pecuária
+      grupos_do_produto=="Grupos de cabeças de galinhas, galos, frangos, frangas e pintos" ~ "Pecuária",
+      grupos_do_produto=="Produtos da agroindústria rural" & Produto %in% setores_agregados_amarelo_pec ~ "Pecuária",
+      TRUE ~ "0"
+    )
+  ) %>% 
+  select(Tipologia, regiao, `Estado (UF)`, `Nome do Município`, `Código IBGE`, censo, Produto, setores, setores_agregados, everything()) %>% 
   `colnames<-`(
-    c("Tipologia", "Região", "Estado", "Municípios", "Código IBGE do Município", "Censo", "Produto", "Setor do produto", "Grupo do Produto",
+    c("Tipologia", "Região", "Estado", "Municípios", "Código IBGE do Município", "Censo", "Produto", "Setor do produto", "Setores Agregados", "Grupo do Produto",
       "Valor da produção", "Unidade de Medida do valor da produção", "Quantidade produzida", "Unidade de Medida da Quantidade produzida", "População")
   )
 
@@ -1114,9 +1139,28 @@ painel_2006 <- painel_2006_aux_num %>%
   ) %>% 
   mutate(Quantidade = as.character(Quantidade)) %>% 
   bind_rows(painel_2006_aux_chr) %>% 
-  mutate(`Unidade de Medida Qt` = "Toneladas") %>% 
+  mutate(
+    `Unidade de Medida Qt` = "Toneladas",
+    setores_agregados = case_when(
+      # Agricultura
+      grupos_do_produto=="Produtos da horticultura"                  ~ "Agricultura",
+      grupos_do_produto=="Produtos da lavoura temporária"            ~ "Agricultura",
+      grupos_do_produto=="Produtos da lavoura permanente"            ~ "Agricultura",
+      grupos_do_produto=="Condição do produtor em relação às terras" ~ "Agricultura",
+      grupos_do_produto=="Produtos da agroindústria rural" & Produto %in% setores_agregados_amarelo_agr ~ "Agricultura",
+      # Sivilcultura e Pesca/Aquicultura
+      grupos_do_produto=="Produtos da silvicultura" ~ "Sivilcultura e Pesca/Aquicultura",
+      grupos_do_produto=="Espécie criada na aquicultura x Condição do produtor em relação às terras" ~ "Sivilcultura e Pesca/Aquicultura",
+      grupos_do_produto=="Produtos da agroindústria rural" & Produto %in% setores_agregados_amarelo_spa ~ "Sivilcultura e Pesca/Aquicultura",
+      # Pecuária
+      grupos_do_produto=="Grupos de cabeças de galinhas, galos, frangos, frangas e pintos" ~ "Pecuária",
+      grupos_do_produto=="Produtos da agroindústria rural" & Produto %in% setores_agregados_amarelo_pec ~ "Pecuária",
+      TRUE ~ "0"
+    )
+  ) %>% 
+  select(Tipologia, regiao, `Estado (UF)`, `Nome do Município`, `Código IBGE`, censo, Produto, setores, setores_agregados, everything()) %>% 
   `colnames<-`(
-    c("Tipologia", "Região", "Estado", "Municípios", "Código IBGE do Município", "Censo", "Produto", "Setor do produto", "Grupo do Produto",
+    c("Tipologia", "Região", "Estado", "Municípios", "Código IBGE do Município", "Censo", "Produto", "Setor do produto", "Setores Agregados", "Grupo do Produto",
       "Valor da produção", "Unidade de Medida do valor da produção", "Quantidade produzida", "Unidade de Medida da Quantidade produzida", "População")
   )
 
@@ -1125,7 +1169,8 @@ painel_2006 <- painel_2006_aux_num %>%
 rm(
   fam_nao_2006, fam_sim_2006, quantidade_produzida_fam_nao_2006, quantidade_produzida_fam_sim_2006,
   valor_da_producao_fam_nao_2006, valor_da_producao_fam_sim_2006, cod_ibge, int_censo, data_populacao,
-  painel_2006_aux_chr, painel_2006_aux_num
+  painel_2006_aux_chr, painel_2006_aux_num, setores_agregados_amarelo, setores_agregados_amarelo_agr,
+  setores_agregados_amarelo_pec, setores_agregados_amarelo_spa
 )
 
 gc()
