@@ -11,8 +11,8 @@ library(writexl)
 
 suppressMessages({
   # Leitura dos Scripts
-  tic(); source("scripts/1. Dados Familiar - Agricultura e Pecuaria - Não.R", encoding = "UTF-8"); toc() # Familiar Não
-  tic(); source("scripts/1. Dados Familiar - Agricultura e Pecuaria - Sim.R", encoding = "UTF-8"); toc() # Familiar Sim
+  tic(); source("scripts/Matrizes IBGE/1. Dados Familiar - Agricultura e Pecuaria - Não.R", encoding = "UTF-8"); toc() # Familiar Não
+  tic(); source("scripts/Matrizes IBGE/1. Dados Familiar - Agricultura e Pecuaria - Sim.R", encoding = "UTF-8"); toc() # Familiar Sim
 })
 
 # Dados - Quantidade e Valor: Familiar Não e Sim
@@ -30,13 +30,13 @@ rm(
 # Dados - Manipulação Produtos --------------------------------------------
 
 suppressMessages({
-  tic(); source("scripts/2. Manipulação Produtos.R", encoding = "UTF-8"); toc() # Manipulação da coluna Produtos - Juntando os menos exportados
+  tic(); source("scripts/Matrizes IBGE/2. Manipulação Produtos.R", encoding = "UTF-8"); toc() # Manipulação da coluna Produtos - Juntando os menos exportados
 })
 
 # Dados - Merge ComexStat -------------------------------------------------
 
 suppressMessages({
-  tic(); source("scripts/3. Merge ComexStat.R", encoding = "UTF-8"); toc() # Adicionando as colunas Quantidade (Toneladas) e Valor FOB (US$)
+  tic(); source("scripts/Matrizes IBGE/3. Merge ComexStat.R", encoding = "UTF-8"); toc() # Adicionando as colunas Quantidade (Toneladas) e Valor FOB (US$)
 })
 
 # Juntando as Bases de dados ----------------------------------------------
@@ -47,7 +47,7 @@ valor_da_producao <- valor_da_producao_agr %>% bind_rows(valor_da_producao_pec)
 # Dados - Share -----------------------------------------------------------
 
 suppressMessages({
-  tic(); source("scripts/4. Participação de Exportação.R", encoding = "UTF-8"); toc() # Participação de Exportação
+  tic(); source("scripts/Matrizes IBGE/4. Participação de Exportação.R", encoding = "UTF-8"); toc() # Participação de Exportação
 })
 
 # Salvando tabelas --------------------------------------------------------
